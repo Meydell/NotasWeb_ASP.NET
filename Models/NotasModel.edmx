@@ -4,11 +4,73 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl" Namespace="NotasModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2005">
-        <EntityContainer Name="NotasModelTargetContainer" >
-        </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+    <Schema Namespace="NotasModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="NotasModelStoreContainer">
+    <EntitySet Name="Estudiantes" EntityType="NotasModel.Store.Estudiantes" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Calificaciones" EntityType="NotasModel.Store.Calificaciones" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Asignaturas" EntityType="NotasModel.Store.Asignaturas" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="EstudianteCalificacion" Association="NotasModel.Store.EstudianteCalificacion">
+      <End Role="Estudiante" EntitySet="Estudiantes" />
+      <End Role="Calificacion" EntitySet="Calificaciones" />
+    </AssociationSet>
+    <AssociationSet Name="AsignaturaCalificacion" Association="NotasModel.Store.AsignaturaCalificacion">
+      <End Role="Asignatura" EntitySet="Asignaturas" />
+      <End Role="Calificacion" EntitySet="Calificaciones" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Estudiantes">
+    <Key>
+      <PropertyRef Name="EstudianteID" />
+    </Key>
+    <Property Name="EstudianteID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Nombres" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Apellidos" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Carnet" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Email" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Calificaciones">
+    <Key>
+      <PropertyRef Name="CalificacionID" />
+    </Key>
+    <Property Name="CalificacionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Acumulado" Type="decimal" Nullable="false" />
+    <Property Name="NotaFinal" Type="decimal" Nullable="false" />
+    <Property Name="EstudianteEstudianteID" Type="int" Nullable="false" />
+    <Property Name="AsignaturaAsignaturaID" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Asignaturas">
+    <Key>
+      <PropertyRef Name="AsignaturaID" />
+    </Key>
+    <Property Name="AsignaturaID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Nombre" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Creditos" Type="int" Nullable="false" />
+  </EntityType>
+  <Association Name="EstudianteCalificacion">
+    <End Role="Estudiante" Type="NotasModel.Store.Estudiantes" Multiplicity="1" />
+    <End Role="Calificacion" Type="NotasModel.Store.Calificaciones" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Estudiante">
+        <PropertyRef Name="EstudianteID" />
+      </Principal>
+      <Dependent Role="Calificacion">
+        <PropertyRef Name="EstudianteEstudianteID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="AsignaturaCalificacion">
+    <End Role="Asignatura" Type="NotasModel.Store.Asignaturas" Multiplicity="1" />
+    <End Role="Calificacion" Type="NotasModel.Store.Calificaciones" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Asignatura">
+        <PropertyRef Name="AsignaturaID" />
+      </Principal>
+      <Dependent Role="Calificacion">
+        <PropertyRef Name="AsignaturaAsignaturaID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="NotasModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
@@ -16,6 +78,14 @@
           <EntitySet Name="Estudiantes" EntityType="NotasModel.Estudiante" />
           <EntitySet Name="Calificaciones" EntityType="NotasModel.Calificacion" />
           <EntitySet Name="Asignaturas" EntityType="NotasModel.Asignatura" />
+          <AssociationSet Name="EstudianteCalificacion" Association="NotasModel.EstudianteCalificacion">
+            <End Role="Estudiante" EntitySet="Estudiantes" />
+            <End Role="Calificacion" EntitySet="Calificaciones" />
+          </AssociationSet>
+          <AssociationSet Name="AsignaturaCalificacion" Association="NotasModel.AsignaturaCalificacion">
+            <End Role="Asignatura" EntitySet="Asignaturas" />
+            <End Role="Calificacion" EntitySet="Calificaciones" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="Estudiante">
           <Key>
@@ -24,38 +94,94 @@
           <Property Name="EstudianteID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Nombres" Type="String" Nullable="false" />
           <Property Name="Apellidos" Type="String" Nullable="false" />
-          <Property Name="Codigo" Type="String" Nullable="false" />
           <Property Name="Carnet" Type="String" Nullable="false" />
           <Property Name="Email" Type="String" Nullable="false" />
+          <NavigationProperty Name="Calificaciones" Relationship="NotasModel.EstudianteCalificacion" FromRole="Estudiante" ToRole="Calificacion" />
         </EntityType>
         <EntityType Name="Calificacion">
           <Key>
             <PropertyRef Name="CalificacionID" />
           </Key>
           <Property Name="CalificacionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="NotaFinal" Type="Decimal" Nullable="false" />
           <Property Name="Acumulado" Type="Decimal" Nullable="false" />
+          <Property Name="NotaFinal" Type="Decimal" Nullable="false" />
+          <NavigationProperty Name="Estudiante" Relationship="NotasModel.EstudianteCalificacion" FromRole="Calificacion" ToRole="Estudiante" />
+          <Property Name="EstudianteEstudianteID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Asignatura" Relationship="NotasModel.AsignaturaCalificacion" FromRole="Calificacion" ToRole="Asignatura" />
+          <Property Name="AsignaturaAsignaturaID" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="Asignatura">
           <Key>
             <PropertyRef Name="AsignaturaID" />
           </Key>
           <Property Name="AsignaturaID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Codigo" Type="String" Nullable="false" />
-          <Property Name="Descripcion" Type="String" Nullable="false" />
+          <Property Name="Nombre" Type="String" Nullable="false" />
           <Property Name="Creditos" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Calificaciones" Relationship="NotasModel.AsignaturaCalificacion" FromRole="Asignatura" ToRole="Calificacion" />
         </EntityType>
+        <Association Name="EstudianteCalificacion">
+          <End Type="NotasModel.Estudiante" Role="Estudiante" Multiplicity="1" />
+          <End Type="NotasModel.Calificacion" Role="Calificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Estudiante">
+              <PropertyRef Name="EstudianteID" />
+            </Principal>
+            <Dependent Role="Calificacion">
+              <PropertyRef Name="EstudianteEstudianteID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="AsignaturaCalificacion">
+          <End Type="NotasModel.Asignatura" Role="Asignatura" Multiplicity="1" />
+          <End Type="NotasModel.Calificacion" Role="Calificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Asignatura">
+              <PropertyRef Name="AsignaturaID" />
+            </Principal>
+            <Dependent Role="Calificacion">
+              <PropertyRef Name="AsignaturaAsignaturaID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
-      <Mapping xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs" Space="C-S">
-        <Alias Key="Model" Value="NotasModel" />
-        <Alias Key="Target" Value="NotasModel.Store" />
-        <EntityContainerMapping CdmEntityContainer="NotasModelContainer" StorageEntityContainer="NotasModelTargetContainer">
-        </EntityContainerMapping>
-      </Mapping>
-    </edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="NotasModelStoreContainer" CdmEntityContainer="NotasModelContainer">
+    <EntitySetMapping Name="Estudiantes">
+      <EntityTypeMapping TypeName="IsTypeOf(NotasModel.Estudiante)">
+        <MappingFragment StoreEntitySet="Estudiantes">
+          <ScalarProperty Name="EstudianteID" ColumnName="EstudianteID" />
+          <ScalarProperty Name="Nombres" ColumnName="Nombres" />
+          <ScalarProperty Name="Apellidos" ColumnName="Apellidos" />
+          <ScalarProperty Name="Carnet" ColumnName="Carnet" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Calificaciones">
+      <EntityTypeMapping TypeName="IsTypeOf(NotasModel.Calificacion)">
+        <MappingFragment StoreEntitySet="Calificaciones">
+          <ScalarProperty Name="CalificacionID" ColumnName="CalificacionID" />
+          <ScalarProperty Name="Acumulado" ColumnName="Acumulado" />
+          <ScalarProperty Name="NotaFinal" ColumnName="NotaFinal" />
+          <ScalarProperty Name="EstudianteEstudianteID" ColumnName="EstudianteEstudianteID" />
+          <ScalarProperty Name="AsignaturaAsignaturaID" ColumnName="AsignaturaAsignaturaID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Asignaturas">
+      <EntityTypeMapping TypeName="IsTypeOf(NotasModel.Asignatura)">
+        <MappingFragment StoreEntitySet="Asignaturas">
+          <ScalarProperty Name="AsignaturaID" ColumnName="AsignaturaID" />
+          <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+          <ScalarProperty Name="Creditos" ColumnName="Creditos" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
   </edmx:Runtime>
   <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
@@ -69,6 +195,7 @@
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
         <DesignerProperty Name="EnablePluralization" Value="False" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
       </DesignerInfoPropertySet>
     </edmx:Options>
     <!-- Diagram content (shape and connector positions) -->
